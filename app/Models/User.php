@@ -63,4 +63,15 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasOne(Tim::class, 'id_user', 'id_user');
     }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
