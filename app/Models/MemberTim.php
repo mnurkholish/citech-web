@@ -33,6 +33,7 @@ class MemberTim extends Model
         'id_tim',
         'nama_peserta',
         'nim_peserta',
+        'jurusan',
         'role',
     ];
 

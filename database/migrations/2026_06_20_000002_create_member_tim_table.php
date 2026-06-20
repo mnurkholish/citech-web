@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id('id_member');
             $table->foreignId('id_tim')->constrained('tim', 'id_tim')->cascadeOnDelete();
             $table->string('nama_peserta');
-            $table->string('nim_peserta')->unique();
+            $table->string('nim_peserta');
+            $table->string('jurusan')->nullable();
             $table->enum('role', ['ketua', 'anggota']);
             $table->timestamps();
         });

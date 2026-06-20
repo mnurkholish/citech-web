@@ -174,7 +174,7 @@ const logout = () => {
 
         <!-- Right Side Brand/Team Name -->
         <div class="flex items-center space-x-4">
-          <span class="text-xs sm:text-sm font-black tracking-wider text-slate-800 uppercase bg-slate-100 hover:bg-slate-200/80 transition px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-slate-200/50 truncate max-w-[140px] sm:max-w-[200px] md:max-w-none">
+          <span class="text-xs sm:text-sm font-black tracking-wider text-slate-800 uppercase bg-slate-100 hover:bg-slate-200/80 transition px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-slate-200/50 truncate max-w-[140px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[360px]">
             {{ role === 'admin' ? 'ADMINISTRATOR' : (teamName || user.name) }}
           </span>
         </div>
