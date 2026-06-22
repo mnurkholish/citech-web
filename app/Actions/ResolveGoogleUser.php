@@ -16,7 +16,10 @@ class ResolveGoogleUser
             return $user;
         }
 
-        $existingUser = User::where('email', $googleUser->getEmail())->first();
+        $email = $googleUser->getEmail();
+        $normalizedEmail = $email !== null ? strtolower($email) : $email;
+
+        $existingUser = User::where('email', $normalizedEmail)->first();
 
         if ($existingUser) {
             $existingUser->update([
@@ -29,9 +32,9 @@ class ResolveGoogleUser
 
         return User::create([
             'name' => $googleUser->getName(),
-            'email' => $googleUser->getEmail(),
+            'email' => $normalizedEmail,
             'google_id' => $googleUser->getId(),
-            'password' => bcrypt(Str::random(24)),
+            'password' => Str::random(24),
             'email_verified_at' => now(),
         ]);
     }

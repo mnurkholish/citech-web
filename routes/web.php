@@ -56,10 +56,18 @@ Route::middleware(['auth', 'verified', 'peserta'])->group(function () {
         $user = auth()->user();
         $existingTim = $user->tim;
 
-        if ($existingTim && $existingTim->dokumen_registrasi && $existingTim->dokumen_registrasi->status_registrasi === 'berhasil') {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'nama_tim' => 'Data tim tidak dapat diubah karena berkas persyaratan pendaftaran sudah disetujui.'
-            ]);
+        if ($existingTim && $existingTim->dokumen_registrasi) {
+            $statusReg = $existingTim->dokumen_registrasi->status_registrasi;
+            if ($statusReg === 'berhasil') {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'nama_tim' => 'Data tim tidak dapat diubah karena berkas persyaratan pendaftaran sudah disetujui.'
+                ]);
+            }
+            if ($statusReg === 'pending') {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'nama_tim' => 'Data tim tidak dapat diubah saat berkas persyaratan pendaftaran sedang diverifikasi oleh panitia.'
+                ]);
+            }
         }
 
         $request->validate([
@@ -176,6 +184,12 @@ Route::middleware(['auth', 'verified', 'peserta'])->group(function () {
             return redirect()->back()->withErrors(['message' => 'Anda harus membuat tim terlebih dahulu.']);
         }
 
+        if ($tim->dokumen_registrasi && $tim->dokumen_registrasi->status_registrasi === 'berhasil') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'file_dokumen' => 'Berkas persyaratan pendaftaran sudah disetujui dan tidak dapat diubah.'
+            ]);
+        }
+
         $request->validate([
             'file_dokumen' => 'required|file|mimes:pdf|max:5120',
         ], [
@@ -211,6 +225,12 @@ Route::middleware(['auth', 'verified', 'peserta'])->group(function () {
             return redirect()->back()->withErrors(['message' => 'Dokumen tidak ditemukan.']);
         }
 
+        if ($tim->dokumen_registrasi->status_registrasi === 'berhasil') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'file_dokumen' => 'Berkas persyaratan pendaftaran sudah disetujui dan tidak dapat dibatalkan.'
+            ]);
+        }
+
         \Illuminate\Support\Facades\Storage::disk('public')->delete($tim->dokumen_registrasi->link_file_registrasi);
         $tim->dokumen_registrasi->delete();
 
@@ -222,6 +242,12 @@ Route::middleware(['auth', 'verified', 'peserta'])->group(function () {
         $tim = $user->tim;
         if (!$tim) {
             return redirect()->back()->withErrors(['message' => 'Anda harus membuat tim terlebih dahulu.']);
+        }
+
+        if ($tim->pembayaran && $tim->pembayaran->status_pembayaran === 'berhasil') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'bukti_pembayaran' => 'Bukti pembayaran sudah disetujui dan tidak dapat diubah.'
+            ]);
         }
 
         $request->validate([
@@ -259,6 +285,13 @@ Route::middleware(['auth', 'verified', 'peserta'])->group(function () {
             return redirect()->back()->withErrors(['message' => 'Data pembayaran tidak ditemukan.']);
         }
 
+        // Guard: prevent cancellation if payment already approved
+        if ($tim->pembayaran->status_pembayaran === 'berhasil') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'bukti_pembayaran' => 'Bukti pembayaran sudah disetujui dan tidak dapat dibatalkan.'
+            ]);
+        }
+
         \Illuminate\Support\Facades\Storage::disk('public')->delete($tim->pembayaran->bukti_pembayaran);
         $tim->pembayaran->delete();
 
@@ -284,7 +317,6 @@ Route::middleware(['auth', 'verified', 'peserta'])->group(function () {
             ]);
         }
 
-        // Check deadline: B2 timeline
         $timelineB2 = \App\Models\Timeline::where('tahap', 'pendaftaran_b2')->first();
         if ($timelineB2 && now() > $timelineB2->tanggal_selesai) {
             throw \Illuminate\Validation\ValidationException::withMessages([
