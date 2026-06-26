@@ -13,6 +13,13 @@ import {
 } from '@lucide/vue';
 import { ref, computed } from 'vue';
 import CitechDashboardLayout from '@/components/CitechDashboardLayout.vue';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 const props = defineProps({
     teams: Array,
@@ -22,6 +29,32 @@ const searchQuery = ref('');
 const statusFilter = ref('all');
 const isRejectModalOpen = ref(false);
 const selectedRegistrasiId = ref(null);
+const selectedTeamDetails = ref(null);
+const isDetailModalOpen = ref(false);
+
+const openTeamDetails = (team) => {
+    const membersList = team.members
+        ? [...team.members].sort((a, b) => {
+              if (a.role === 'ketua') {
+                  return -1;
+              }
+              if (b.role === 'ketua') {
+                  return 1;
+              }
+              return a.id_member - b.id_member;
+          })
+        : [];
+
+    selectedTeamDetails.value = {
+        ...team,
+        sortedMembers: membersList,
+    };
+    isDetailModalOpen.value = true;
+};
+
+const closeTeamDetails = () => {
+    isDetailModalOpen.value = false;
+};
 
 const rejectionForm = useForm({
     status: 'ditolak',
@@ -281,48 +314,14 @@ const submitRejection = () => {
 
                                 <!-- Members count/details -->
                                 <td class="px-6 py-4">
-                                    <div class="space-y-2">
-                                        <div
-                                            v-for="member in team.members"
-                                            :key="member.id_member"
-                                            class="space-y-0.5"
-                                        >
-                                            <div
-                                                class="flex items-center space-x-1.5"
-                                            >
-                                                <span
-                                                    class="inline-block rounded border px-1.5 py-0.5 text-[8px] font-black tracking-wider uppercase"
-                                                    :class="
-                                                        member.role === 'ketua'
-                                                            ? 'border-blue-100 bg-blue-50 text-blue-600'
-                                                            : 'border-slate-100 bg-slate-50 text-slate-500'
-                                                    "
-                                                >
-                                                    {{ member.role }}
-                                                </span>
-                                                <span
-                                                    class="text-[11px] font-bold text-slate-700"
-                                                >
-                                                    {{ member.nama_peserta }}
-                                                </span>
-                                            </div>
-                                            <div
-                                                class="pl-2 text-[9px] font-semibold text-slate-400"
-                                            >
-                                                NIM. {{ member.nim_peserta }} •
-                                                {{ member.jurusan || '-' }}
-                                            </div>
-                                        </div>
-                                        <div
-                                            v-if="
-                                                !team.members ||
-                                                team.members.length === 0
-                                            "
-                                            class="text-[10px] font-bold text-slate-400"
-                                        >
-                                            Belum Ada Anggota
-                                        </div>
-                                    </div>
+                                    <Button
+                                        size="sm"
+                                        @click="openTeamDetails(team)"
+                                        class="inline-flex items-center space-x-1 rounded-lg bg-blue-950 px-3 py-1.5 text-[10px] font-black tracking-wider text-white uppercase shadow-sm transition hover:bg-blue-900"
+                                    >
+                                        <Info class="h-3.5 w-3.5" />
+                                        <span>Detail Anggota</span>
+                                    </Button>
                                 </td>
 
                                 <!-- Upload Date -->
@@ -627,6 +626,116 @@ const submitRejection = () => {
                 </div>
             </div>
         </div>
+
+        <!-- Custom Details Modal (Centralized glassmorphic look) -->
+        <Dialog
+            v-model:open="isDetailModalOpen"
+            @update:open="(val) => !val && closeTeamDetails()"
+        >
+            <DialogContent
+                v-if="selectedTeamDetails"
+                class="max-w-2xl overflow-hidden rounded-3xl border-none p-0 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]"
+            >
+                <!-- Header -->
+                <DialogHeader
+                    class="flex flex-row items-center justify-between space-y-0 border-b border-slate-100 p-6"
+                >
+                    <div class="space-y-1">
+                        <DialogTitle
+                            class="text-lg leading-tight font-black text-slate-900"
+                        >
+                            Detail Anggota Kelompok
+                        </DialogTitle>
+                        <p
+                            class="text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+                        >
+                            {{ selectedTeamDetails.nama_tim }} -
+                            {{ selectedTeamDetails.universitas }}
+                        </p>
+                    </div>
+                </DialogHeader>
+
+                <!-- Body -->
+                <div class="space-y-6 p-6">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div
+                            v-for="(
+                                member, index
+                            ) in selectedTeamDetails.sortedMembers"
+                            :key="member.id_member"
+                            class="space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-5"
+                        >
+                            <div class="flex items-center justify-between">
+                                <span
+                                    class="text-[9px] font-black tracking-wider text-slate-400 uppercase"
+                                >
+                                    {{
+                                        member.role === 'ketua'
+                                            ? 'Ketua Kelompok'
+                                            : `Anggota ${index}`
+                                    }}
+                                </span>
+                                <span
+                                    class="rounded border px-2 py-0.5 text-[8px] font-black tracking-wider uppercase"
+                                    :class="
+                                        member.role === 'ketua'
+                                            ? 'border-blue-900 bg-blue-900 text-white'
+                                            : 'border-slate-200 bg-slate-100 text-slate-600'
+                                    "
+                                >
+                                    {{ member.role }}
+                                </span>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="space-y-0.5">
+                                    <span
+                                        class="text-[9px] font-bold tracking-wider text-slate-400 uppercase"
+                                        >Nama Lengkap</span
+                                    >
+                                    <p
+                                        class="text-xs font-extrabold text-slate-800"
+                                    >
+                                        {{ member.nama_peserta }}
+                                    </p>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span
+                                        class="text-[9px] font-bold tracking-wider text-slate-400 uppercase"
+                                        >NIM / Identitas</span
+                                    >
+                                    <p
+                                        class="text-xs font-extrabold text-slate-800"
+                                    >
+                                        {{ member.nim_peserta }}
+                                    </p>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <span
+                                        class="text-[9px] font-bold tracking-wider text-slate-400 uppercase"
+                                        >Jurusan</span
+                                    >
+                                    <p
+                                        class="text-xs font-extrabold text-slate-800"
+                                    >
+                                        {{ member.jurusan || '-' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end border-t border-slate-100 p-6">
+                    <Button
+                        @click="closeTeamDetails"
+                        class="rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800"
+                    >
+                        Tutup Detail
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
     </CitechDashboardLayout>
 </template>
 
