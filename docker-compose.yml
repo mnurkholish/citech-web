@@ -15,7 +15,7 @@ services:
     volumes:
       - storage:/var/www/html/storage
       - app_public:/var/www/html/public_shared
-    command: sh -c "cp -rp /var/www/html/public/. /var/www/html/public_shared/ && php-fpm"
+    command: sh -c "cp -rp /var/www/html/public/. /var/www/html/public_shared/ && chmod -R 755 /var/www/html/storage && php-fpm"
     environment:
       APP_ENV: ${APP_ENV:-production}
       APP_DEBUG: ${APP_DEBUG:-false}
