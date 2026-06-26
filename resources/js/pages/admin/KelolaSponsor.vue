@@ -37,7 +37,7 @@ const props = withDefaults(
     }>(),
     {
         sponsors: () => [],
-    }
+    },
 );
 
 // Modal State

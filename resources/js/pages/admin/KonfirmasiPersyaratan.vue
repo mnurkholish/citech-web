@@ -281,20 +281,37 @@ const submitRejection = () => {
 
                                 <!-- Members count/details -->
                                 <td class="px-6 py-4">
-                                    <div
-                                        class="flex items-center space-x-1.5 text-slate-500"
-                                    >
-                                        <Users
-                                            class="h-4 w-4 flex-shrink-0 text-slate-400"
-                                        />
-                                        <span
-                                            >{{
-                                                team.members
-                                                    ? team.members.length
-                                                    : 0
-                                            }}
-                                            Anggota</span
+                                    <div class="space-y-1.5">
+                                        <div
+                                            v-for="member in team.members"
+                                            :key="member.id_member"
+                                            class="flex items-center space-x-1.5"
                                         >
+                                            <span
+                                                class="inline-block rounded border px-1.5 py-0.5 text-[8px] font-black tracking-wider uppercase"
+                                                :class="
+                                                    member.role === 'ketua'
+                                                        ? 'border-blue-100 bg-blue-50 text-blue-600'
+                                                        : 'border-slate-100 bg-slate-50 text-slate-500'
+                                                "
+                                            >
+                                                {{ member.role }}
+                                            </span>
+                                            <span
+                                                class="text-[11px] font-bold text-slate-700"
+                                            >
+                                                {{ member.nama_peserta }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="
+                                                !team.members ||
+                                                team.members.length === 0
+                                            "
+                                            class="text-[10px] font-bold text-slate-400"
+                                        >
+                                            Belum Ada Anggota
+                                        </div>
                                     </div>
                                 </td>
 

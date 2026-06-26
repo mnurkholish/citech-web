@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\StatusRegistrasi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
@@ -32,13 +33,24 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
+
+        if ($user->tim) {
+            $tim = $user->tim;
+            $hasApprovedDoc = $tim->dokumen_registrasi && $tim->dokumen_registrasi->status_registrasi === StatusRegistrasi::Berhasil->value;
+            if (! $hasApprovedDoc) {
+                $tim->members()->where('role', 'ketua')->update([
+                    'nama_peserta' => $user->name,
+                ]);
+            }
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);
 

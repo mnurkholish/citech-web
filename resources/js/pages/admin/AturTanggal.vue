@@ -32,7 +32,7 @@ const tahapOrder = [
     'awarding',
 ] as const;
 
-type Tahap = typeof tahapOrder[number];
+type Tahap = (typeof tahapOrder)[number];
 
 const getTimelineData = (tahap: Tahap) => {
     const tl = props.timelines?.find((t) => t.tahap === tahap);
@@ -161,7 +161,7 @@ const cancelSave = () => {
                         class="inline-flex items-center gap-2 rounded-xl bg-[#1e4d8c] px-6 py-3 text-xs font-extrabold tracking-wider text-white uppercase shadow-md transition hover:bg-[#153a6b] hover:shadow-lg disabled:opacity-50"
                     >
                         <Save class="h-4 w-4" />
-                        Simpan Timeline 
+                        Simpan Timeline
                     </button>
                 </div>
             </form>
