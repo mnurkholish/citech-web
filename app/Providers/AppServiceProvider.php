@@ -24,8 +24,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        if (str_starts_with(config('app.url'), 'https://')) {
+        if (str_starts_with(config('app.url'), 'https://') ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ||
+            (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'citech.ukmlaos.com')) {
             URL::forceScheme('https');
+            if ($this->app->bound('request')) {
+                request()->server->set('HTTPS', 'on');
+            }
         }
 
         // Customize default password rules as requested by the user:
