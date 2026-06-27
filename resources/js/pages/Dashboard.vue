@@ -215,7 +215,7 @@ const getTimelineCircleClass = (start, end) => {
                                 </p>
                             </div>
                             <a
-                                href="#"
+                                href="https://drive.google.com/file/d/1OlC2P_iN2iphKUnEEwFGyk1OT85wd5Yc/"
                                 class="flex items-center space-x-1 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-xs font-black text-blue-600 transition hover:bg-blue-100"
                             >
                                 <span>Download</span>
@@ -236,7 +236,7 @@ const getTimelineCircleClass = (start, end) => {
                                 </p>
                             </div>
                             <a
-                                href="#"
+                                href="https://docs.google.com/document/d/1Gc14bo2faif2RGylhrdr39RbbFATsC9O9pD8gJoujIY/"
                                 class="flex items-center space-x-1 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-xs font-black text-blue-600 transition hover:bg-blue-100"
                             >
                                 <span>Download</span>

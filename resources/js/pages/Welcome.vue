@@ -601,7 +601,7 @@ const formattedTimelineItems = computed(() => {
                     <span>Daftar Sekarang</span>
                 </Link>
                 <a
-                    href="#"
+                    href="https://drive.google.com/file/d/1OlC2P_iN2iphKUnEEwFGyk1OT85wd5Yc/"
                     class="flex w-full items-center justify-center space-x-2 rounded-xl border border-slate-200 bg-white px-10 py-4 text-sm font-bold text-slate-700 shadow-sm transition-all duration-300 hover:scale-[1.03] hover:bg-slate-50 active:scale-95 sm:w-auto"
                 >
                     <FileText class="h-4 w-4 text-slate-400" />
