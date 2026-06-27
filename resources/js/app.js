@@ -37,8 +37,12 @@ const showFlashToast = (page) => {
     }
 };
 
-router.on('finish', () => {
-    showFlashToast(router.page);
+router.on('success', (event) => {
+    showFlashToast(event.detail.page);
+});
+
+router.on('finish', (event) => {
+    showFlashToast(event.detail.page);
 });
 
 router.on('error', (event) => {
