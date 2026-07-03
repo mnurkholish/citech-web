@@ -98,6 +98,9 @@ COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=node-build /var/www/html/public/build ./public/build
 COPY . .
 
+RUN echo "upload_max_filesize = 10M" >> /usr/local/etc/php/conf.d/uploads.ini \
+  && echo "post_max_size = 10M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev --no-interaction \
   && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
