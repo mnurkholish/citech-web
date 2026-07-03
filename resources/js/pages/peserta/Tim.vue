@@ -57,6 +57,20 @@ const handleFileChange = (e) => {
     const file = e.target.files[0];
 
     if (file) {
+        // Validasi ukuran file maksimal 5MB
+        const maxSize = 5 * 1024 * 1024; // 5MB dalam bytes
+        
+        if (file.size > maxSize) {
+            const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+            uploadForm.setError('file_dokumen', `Ukuran berkas maksimal adalah 5MB. File Anda berukuran ${fileSizeMB}MB.`);
+            selectedFileName.value = '';
+            uploadForm.file_dokumen = null;
+            // Reset file input
+            e.target.value = '';
+            return;
+        }
+        
+        uploadForm.clearErrors('file_dokumen');
         uploadForm.file_dokumen = file;
         selectedFileName.value = file.name;
     }
@@ -116,6 +130,20 @@ const handlePaymentFileChange = (e) => {
     const file = e.target.files[0];
 
     if (file) {
+        // Validasi ukuran file maksimal 5MB
+        const maxSize = 5 * 1024 * 1024; // 5MB dalam bytes
+        
+        if (file.size > maxSize) {
+            const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+            paymentForm.setError('bukti_pembayaran', `Ukuran berkas maksimal adalah 5MB. File Anda berukuran ${fileSizeMB}MB.`);
+            selectedPaymentFileName.value = '';
+            paymentForm.bukti_pembayaran = null;
+            // Reset file input
+            e.target.value = '';
+            return;
+        }
+        
+        paymentForm.clearErrors('bukti_pembayaran');
         paymentForm.bukti_pembayaran = file;
         selectedPaymentFileName.value = file.name;
     }
