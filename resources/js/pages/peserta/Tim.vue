@@ -81,6 +81,12 @@ const triggerFileInput = () => {
 };
 
 const submitDocument = () => {
+    // Validasi file harus dipilih
+    if (!uploadForm.file_dokumen) {
+        uploadForm.setError('file_dokumen', 'Kolom berkas tidak boleh kosong');
+        return;
+    }
+    
     uploadForm.post(route('peserta.tim.dokumen.store'), {
         onSuccess: () => {
             isUploadModalOpen.value = false;
@@ -153,6 +159,12 @@ const triggerPaymentFileInput = () => {
     paymentFileInput.value.click();
 };
 const submitPayment = () => {
+    // Validasi file harus dipilih
+    if (!paymentForm.bukti_pembayaran) {
+        paymentForm.setError('bukti_pembayaran', 'Kolom bukti pembayaran tidak boleh kosong');
+        return;
+    }
+    
     paymentForm.post(route('peserta.tim.pembayaran.store'), {
         onSuccess: () => {
             isPaymentUploadModalOpen.value = false;
