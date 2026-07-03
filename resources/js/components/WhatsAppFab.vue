@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 
 const props = defineProps({
     phoneNumber: {
@@ -12,31 +12,67 @@ const props = defineProps({
     },
 });
 
+const isExpanded = ref(true);
+let hideTimeout = null;
+
+const showForThreeSeconds = () => {
+    isExpanded.value = true;
+
+    if (hideTimeout) {
+        window.clearTimeout(hideTimeout);
+    }
+
+    hideTimeout = window.setTimeout(() => {
+        isExpanded.value = false;
+    }, 3000);
+};
+
+onMounted(() => {
+    showForThreeSeconds();
+});
+
+onBeforeUnmount(() => {
+    if (hideTimeout) {
+        window.clearTimeout(hideTimeout);
+    }
+});
+
+const handleClick = (event) => {
+    if (!isExpanded.value) {
+        event.preventDefault();
+        showForThreeSeconds();
+        return;
+    }
+
+    showForThreeSeconds();
+};
+
 const waLink = computed(() => {
     const base = `https://wa.me/${props.phoneNumber}`;
 
-    return props.message ? `${base}?text=${encodeURIComponent(props.message)}` : base;
+    return props.message
+        ? `${base}?text=${encodeURIComponent(props.message)}`
+        : base;
 });
 </script>
 
 <template>
     <a
-        :href="waLink"
+        :href="isExpanded ? waLink : undefined"
         target="_blank"
         rel="noopener noreferrer"
-        class="fixed bottom-6 right-6 z-[9999] flex items-center group transition-all duration-300 md:bottom-8 md:right-8"
+        @click="handleClick"
+        :class="[
+            'group fixed right-6 bottom-6 z-[9999] flex items-center transition-all duration-700 md:right-8 md:bottom-8',
+            isExpanded
+                ? 'translate-x-0 scale-100 opacity-100'
+                : 'translate-x-[calc(100%-0.1rem)] scale-90 opacity-40',
+        ]"
         aria-label="Hubungi Humas CITECH via WhatsApp"
     >
-        <!-- Label/Tooltip that slides out on hover -->
-        <span
-            class="mr-3 scale-0 origin-right transition-all duration-300 opacity-0 group-hover:scale-100 group-hover:opacity-100 bg-white text-slate-800 text-xs font-black px-3.5 py-2.5 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-slate-100 whitespace-nowrap select-none pointer-events-none"
-        >
-            Hubungi Humas CITECH
-        </span>
-
         <!-- The circular button with ring animation -->
         <div
-            class="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(37,211,102,0.3)] transition-all duration-300 hover:scale-110 active:scale-95 animate-pulse-ring"
+            class="animate-pulse-ring relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(37,211,102,0.3)] transition-all duration-300 hover:scale-110 active:scale-95"
         >
             <!-- WhatsApp SVG Icon -->
             <svg
